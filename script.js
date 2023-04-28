@@ -9,6 +9,7 @@ const modalEl = document.getElementById("modal");
 const modalCloseBtn = document.getElementById("closeBtn");
 const deleteBtn = document.querySelector("#deleteBtn");
 const cancelBtn = document.querySelector("#cancel");
+const filterInput = document.querySelector("#filter");
 
 // globally scopes custom error message for form control
 const errMessage = document.createElement("p");
@@ -81,15 +82,6 @@ inputEl.addEventListener("blur", () => {
 });
 
 // removes one item
-// itemsEl.addEventListener("click", (e) => {
-//   e.stopPropagation;
-//   if (e.target.tagName === "I") {
-//     e.target.parentElement.parentElement.remove();
-//     checkItems();
-//     return;
-//   }
-// });
-
 itemsEl.addEventListener("click", (e) => {
   e.stopPropagation;
   const targetItem = e.target.parentElement.parentElement;
@@ -121,6 +113,19 @@ clearEl.addEventListener("click", () => {
   const items = Array.from(itemsEl.children);
   items.forEach((item) => item.remove());
   checkItems();
+});
+
+filterEl.addEventListener("input", () => {
+  const filterParam = filterInput.value.toLowerCase();
+  const items = Array.from(itemsEl.children);
+  items.forEach((item) => {
+    const itemText = item.textContent.toLowerCase();
+    if (itemText.includes(filterParam)) {
+      item.style.display = "flex";
+    } else {
+      item.style.display = "none";
+    }
+  });
 });
 
 // INITIALIZATION
