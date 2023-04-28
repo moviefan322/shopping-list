@@ -2,6 +2,7 @@ const inputEl = document.querySelector("#item-input");
 const formEl = document.querySelector("#item-form");
 const itemsEl = document.querySelector("#item-list");
 const clearEl = document.querySelector("#clear");
+const filterEl = document.querySelector(".filter");
 
 // globally scopes custom error message for form control
 const errMessage = document.createElement("p");
@@ -9,6 +10,8 @@ errMessage.textContent = "Please write an item to add";
 errMessage.style.color = "red";
 errMessage.style.fontWeight = "bold";
 errMessage.style.marginBottom = ".8em";
+
+console.log(itemsEl.children.length);
 
 // adds new item to the list
 const addItem = (e) => {
@@ -37,6 +40,8 @@ const addItem = (e) => {
   newIl.appendChild(newBut);
   itemsEl.appendChild(newIl);
   inputEl.value = "";
+  filterEl.style.display = "block";
+  clearEl.style.display = "block";
 };
 
 // Event Listeners
@@ -63,10 +68,17 @@ itemsEl.addEventListener("click", (e) => {
   e.stopPropagation;
   if (e.target.tagName === "I") {
     e.target.parentElement.parentElement.remove();
+    if (itemsEl.children.length === 0) {
+      filterEl.style.display = "none";
+      clearEl.style.display = "none";
+    }
+    return;
   }
 });
 
 clearEl.addEventListener("click", () => {
   const items = Array.from(itemsEl.children);
   items.forEach((item) => item.remove());
+  filterEl.style.display = "none";
+  clearEl.style.display = "none";
 });
