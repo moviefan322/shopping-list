@@ -1,8 +1,14 @@
+// DEPENDENCIES
+
 const inputEl = document.querySelector("#item-input");
 const formEl = document.querySelector("#item-form");
 const itemsEl = document.querySelector("#item-list");
 const clearEl = document.querySelector("#clear");
 const filterEl = document.querySelector(".filter");
+const modalEl = document.getElementById("modal");
+const modalCloseBtn = document.getElementById("closeBtn");
+const deleteBtn = document.querySelector("#deleteBtn");
+const cancelBtn = document.querySelector("#cancel");
 
 // globally scopes custom error message for form control
 const errMessage = document.createElement("p");
@@ -12,6 +18,8 @@ errMessage.style.fontWeight = "bold";
 errMessage.style.marginBottom = ".8em";
 
 console.log(itemsEl.children.length);
+
+// FUNCTIONS
 
 // adds new item to the list
 const addItem = (e) => {
@@ -39,9 +47,18 @@ const addItem = (e) => {
   newBut.appendChild(newIcon);
   newIl.appendChild(newBut);
   itemsEl.appendChild(newIl);
+  checkItems();
   inputEl.value = "";
-  filterEl.style.display = "block";
-  clearEl.style.display = "block";
+};
+
+const checkItems = () => {
+  if (itemsEl.children.length === 0) {
+    filterEl.style.display = "none";
+    clearEl.style.display = "none";
+  } else {
+    filterEl.style.display = "block";
+    clearEl.style.display = "block";
+  }
 };
 
 // Event Listeners
@@ -63,22 +80,49 @@ inputEl.addEventListener("blur", () => {
   inputEl.style.outlineColor = "";
 });
 
-// add event listener to item ul
+// removes one item
+// itemsEl.addEventListener("click", (e) => {
+//   e.stopPropagation;
+//   if (e.target.tagName === "I") {
+//     e.target.parentElement.parentElement.remove();
+//     checkItems();
+//     return;
+//   }
+// });
+
 itemsEl.addEventListener("click", (e) => {
   e.stopPropagation;
+  const targetItem = e.target.parentElement.parentElement;
   if (e.target.tagName === "I") {
-    e.target.parentElement.parentElement.remove();
-    if (itemsEl.children.length === 0) {
-      filterEl.style.display = "none";
-      clearEl.style.display = "none";
-    }
-    return;
+    modalEl.style.display = "block";
+
+    deleteBtn.addEventListener("click", () => {
+      targetItem.remove();
+      modalEl.style.display = "none";
+      checkItems();
+    });
   }
 });
 
+modalCloseBtn.addEventListener("click", () => {
+  modalEl.style.display = "none";
+});
+
+cancelBtn.addEventListener("click", () => {
+  modalEl.style.display = "none";
+});
+
+window.addEventListener("click", (e) => {
+  if (e.target == modalEl) modalEl.style.display = "none";
+});
+
+// removes all items
 clearEl.addEventListener("click", () => {
   const items = Array.from(itemsEl.children);
   items.forEach((item) => item.remove());
-  filterEl.style.display = "none";
-  clearEl.style.display = "none";
+  checkItems();
 });
+
+// INITIALIZATION
+
+checkItems();
