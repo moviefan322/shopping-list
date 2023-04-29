@@ -15,7 +15,6 @@ const formControl = document.querySelector(".form-control");
 
 // globally scopes custom error message for form control
 const errMessage = document.createElement("p");
-errMessage.textContent = "Please write an item to add";
 errMessage.style.color = "red";
 errMessage.style.fontWeight = "bold";
 errMessage.style.marginBottom = ".8em";
@@ -49,6 +48,7 @@ const addItem = (e) => {
     inputEl.style.outlineStyle = "solid";
     inputEl.style.outlineWidth = "2px";
     inputEl.style.outlineColor = "red";
+    errMessage.textContent = "Please write an item to add";
     inputEl.insertAdjacentElement("afterend", errMessage);
     return;
   } else if (items.some((item) => item.textContent.includes(newItem))) {
