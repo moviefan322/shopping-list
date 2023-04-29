@@ -10,6 +10,7 @@ const modalCloseBtn = document.getElementById("closeBtn");
 const deleteBtn = document.querySelector("#deleteBtn");
 const cancelBtn = document.querySelector("#cancel");
 const filterInput = document.querySelector("#filter");
+const addItemBtn = document.querySelector("#addItemBtn");
 
 // globally scopes custom error message for form control
 const errMessage = document.createElement("p");
@@ -94,6 +95,61 @@ const checkItems = () => {
   }
 };
 
+const editItem = (e) => {
+  inputEl.style.outlineStyle = "solid";
+  inputEl.style.outlineWidth = "2px";
+  inputEl.style.outlineColor = "yellow";
+  inputEl.value = e.textContent;
+  addItemBtn.textContent = "Save Changes";
+  const editMessage = document.createElement("p");
+  editMessage.textContent = `Edit ${e.textContent}`;
+  editMessage.style.color = "black";
+  editMessage.style.fontWeight = "bold";
+  editMessage.style.marginBottom = ".8em";
+  inputEl.insertAdjacentElement("beforebegin", editMessage);
+  formEl.removeEventListener("submit", addItem);
+  localStorageItems = JSON.parse(localStorage.getItem("items"));
+  const localStorageArray = Array.from(localStorageItems);
+  const index = localStorageArray.indexOf(e.textContent);
+
+  addItemBtn.addEventListener("click", () => {
+    console.log(inputEl.value);
+    restoreButton();
+    removeItemFromLocalStorage(e.textContent);
+    addItemToLocalStorageWithIndex(inputEl.value, index);
+  });
+  console.log(e);
+};
+
+const restoreButton = () => {
+  () => {
+    inputEl.style.outlineStyle = "";
+    inputEl.style.outlineWidth = "";
+    inputEl.style.outlineColor = "";
+    inputEl.value = "";
+    addItemBtn.innerHTL = `<i class="fa-solid fa-plus"></i> Add Item`;
+  };
+};
+
+const addItemToLocalStorageWithIndex = (item, index) => {
+  localStorageItems = JSON.parse(localStorage.getItem("items"));
+  localStorageItems.splice(index, 0, item);
+  localStorage.setItem("items", JSON.stringify(localStorageItems));
+};
+
+const removeItemFromLocalStorage = (textContent) => {
+  localStorageItems = JSON.parse(localStorage.getItem("items"));
+  const localStorageArray = Array.from(localStorageItems);
+  localStorageArray.forEach((item) => {
+    if (item.includes(textContent)) {
+      const deleteIndex = localStorageArray.indexOf(item);
+      localStorageArray.splice(deleteIndex, 1);
+      return localStorageArray;
+    }
+  });
+  localStorage.setItem("items", JSON.stringify(localStorageArray));
+};
+
 // Event Listeners
 
 // invokes add item
@@ -126,17 +182,10 @@ itemsEl.addEventListener("click", (e) => {
       modalEl.style.display = "none";
       checkItems();
 
-      localStorageItems = JSON.parse(localStorage.getItem("items"));
-      const localStorageArray = Array.from(localStorageItems);
-      localStorageArray.forEach((item) => {
-        if (item.includes(targetItemText)) {
-          const deleteIndex = localStorageArray.indexOf(item);
-          localStorageArray.splice(deleteIndex, 1);
-          return localStorageArray;
-        }
-      });
-      localStorage.setItem("items", JSON.stringify(localStorageArray));
+      removeItemFromLocalStorage(targetItemText);
     });
+  } else {
+    editItem(e.target);
   }
 });
 
