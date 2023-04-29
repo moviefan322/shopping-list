@@ -22,13 +22,23 @@ console.log(itemsEl.children.length);
 
 // FUNCTIONS
 
+// checks local storage for any items to render to DOM
+const checkLocalStorage = () => {
+  let itemsToRender;
+
+  if (localStorage.getItem("items") === null) {
+    itemsToRender = [];
+  } else {
+    itemsToRender = JSON.parse(localStorage.getItem("items"));
+    itemsToRender.forEach((item) => addItemToDom(item));
+  }
+};
+
 // adds new item to the list
 const addItem = (e) => {
   e.preventDefault();
   const newItem = inputEl.value;
   errMessage.remove();
-
-  console.log(newItem.length);
 
   if (newItem.length === 0) {
     inputEl.style.outlineStyle = "solid";
@@ -38,8 +48,17 @@ const addItem = (e) => {
     return;
   }
 
+  addItemToDom(newItem);
+  addItemToLocalStorage(newItem);
+
+  checkItems();
+  inputEl.value = "";
+};
+
+// renders items to the DOM
+const addItemToDom = (item) => {
   const newIl = document.createElement("li");
-  newIl.appendChild(document.createTextNode(newItem));
+  newIl.appendChild(document.createTextNode(item));
   const newBut = document.createElement("button");
   newBut.classList = "remove-item btn-link text-red";
   const newIcon = document.createElement("i");
@@ -48,10 +67,23 @@ const addItem = (e) => {
   newBut.appendChild(newIcon);
   newIl.appendChild(newBut);
   itemsEl.appendChild(newIl);
-  checkItems();
-  inputEl.value = "";
 };
 
+// adds an item to local storage
+const addItemToLocalStorage = (item) => {
+  let localStorageItems;
+
+  if (localStorage.getItem("items") === null) {
+    localStorageItems = [];
+  } else {
+    localStorageItems = JSON.parse(localStorage.getItem("items"));
+  }
+
+  localStorageItems.push(item);
+  localStorage.setItem("items", JSON.stringify(localStorageItems));
+};
+
+// hides elements if list is empty
 const checkItems = () => {
   if (itemsEl.children.length === 0) {
     filterEl.style.display = "none";
@@ -85,6 +117,7 @@ inputEl.addEventListener("blur", () => {
 itemsEl.addEventListener("click", (e) => {
   e.stopPropagation;
   const targetItem = e.target.parentElement.parentElement;
+  const targetItemText = e.target.parentElement.parentElement.textContent;
   if (e.target.tagName === "I") {
     modalEl.style.display = "block";
 
@@ -92,6 +125,17 @@ itemsEl.addEventListener("click", (e) => {
       targetItem.remove();
       modalEl.style.display = "none";
       checkItems();
+
+      localStorageItems = JSON.parse(localStorage.getItem("items"));
+      const localStorageArray = Array.from(localStorageItems);
+      localStorageArray.forEach((item) => {
+        if (item.includes(targetItemText)) {
+          const deleteIndex = localStorageArray.indexOf(item);
+          localStorageArray.splice(deleteIndex, 1);
+          return localStorageArray;
+        }
+      });
+      localStorage.setItem("items", JSON.stringify(localStorageArray));
     });
   }
 });
@@ -110,9 +154,15 @@ window.addEventListener("click", (e) => {
 
 // removes all items
 clearEl.addEventListener("click", () => {
-  const items = Array.from(itemsEl.children);
-  items.forEach((item) => item.remove());
-  checkItems();
+  modalEl.style.display = "block";
+
+  deleteBtn.addEventListener("click", () => {
+    const items = Array.from(itemsEl.children);
+    items.forEach((item) => item.remove());
+    checkItems();
+    localStorage.removeItem("items");
+    modalEl.style.display = "none";
+  });
 });
 
 filterEl.addEventListener("input", () => {
@@ -130,4 +180,5 @@ filterEl.addEventListener("input", () => {
 
 // INITIALIZATION
 
+checkLocalStorage();
 checkItems();
