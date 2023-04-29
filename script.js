@@ -12,14 +12,13 @@ const cancelBtn = document.querySelector("#cancel");
 const filterInput = document.querySelector("#filter");
 const addItemBtn = document.querySelector("#addItemBtn");
 const formControl = document.querySelector(".form-control");
+const cancelBtn2 = document.createElement("button");
 
 // globally scopes custom error message for form control
 const errMessage = document.createElement("p");
 errMessage.style.color = "red";
 errMessage.style.fontWeight = "bold";
 errMessage.style.marginBottom = ".8em";
-
-console.log(itemsEl.children.length);
 
 // FUNCTIONS
 
@@ -39,7 +38,6 @@ const checkLocalStorage = () => {
 const addItem = (e) => {
   e.preventDefault();
   const items = Array.from(itemsEl.children);
-  items.forEach((item) => console.log(item.childNodes[0]));
   const newItem = inputEl.value;
   errMessage.remove();
   console.log("newitem", newItem);
@@ -104,22 +102,26 @@ const checkItems = () => {
 };
 
 const editItem = (e) => {
+  const allButtons = document.querySelectorAll("button");
+  const allButtonsArr = Array.from(allButtons);
+  console.log(allButtonsArr);
   if (formControl.children[0].tagName === "P") {
     const formP = formControl.querySelectorAll("p");
     formP.forEach((p) => p.remove());
   }
+
+  cancelBtn2.remove();
   const items = Array.from(itemsEl.children);
   items.forEach((item) => item.classList.remove("edit-mode"));
 
   e.classList.add("edit-mode");
   console.log("e", e);
-  const cancelBtn = document.createElement("button");
-  cancelBtn.style.backgroundColor = "gray";
-  cancelBtn.classList.add("btn");
-  cancelBtn.style.color = "white";
-  cancelBtn.textContent = "Cancel";
-  cancelBtn.style.marginLeft = ".5em";
-  addItemBtn.insertAdjacentElement("afterend", cancelBtn);
+  cancelBtn2.style.backgroundColor = "gray";
+  cancelBtn2.classList.add("btn");
+  cancelBtn2.style.color = "white";
+  cancelBtn2.textContent = "Cancel";
+  cancelBtn2.style.marginLeft = ".5em";
+  addItemBtn.insertAdjacentElement("afterend", cancelBtn2);
   inputEl.style.outlineStyle = "solid";
   inputEl.style.outlineWidth = "2px";
   inputEl.style.outlineColor = "yellow";
@@ -138,12 +140,20 @@ const editItem = (e) => {
   const index = localStorageArray.indexOf(e.textContent);
 
   addItemBtn.addEventListener("click", () => {
+    console.log(items);
     if (inputEl.value === e.textContent) {
+      cancelBtn2.remove();
+      return;
+    } else if (items.some((item) => item.textContent.includes(inputEl.value))) {
+      errMessage.textContent = "This item already exists";
+      inputEl.insertAdjacentElement("afterend", errMessage);
+      cancelBtn2.remove();
       return;
     }
     restoreButton();
     removeItemFromLocalStorage(e.textContent);
     addItemToLocalStorageWithIndex(inputEl.value, index);
+    cancelBtn2.remove();
   });
 };
 
