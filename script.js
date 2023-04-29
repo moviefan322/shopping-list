@@ -51,7 +51,7 @@ const addItem = (e) => {
     inputEl.style.outlineColor = "red";
     inputEl.insertAdjacentElement("afterend", errMessage);
     return;
-  } else if (items.some((item) => item.innerHTML.includes(newItem))) {
+  } else if (items.some((item) => item.textContent.includes(newItem))) {
     errMessage.textContent = "This item already exists";
     inputEl.insertAdjacentElement("afterend", errMessage);
     return;
@@ -113,6 +113,13 @@ const editItem = (e) => {
 
   e.classList.add("edit-mode");
   console.log("e", e);
+  const cancelBtn = document.createElement("button");
+  cancelBtn.style.backgroundColor = "gray";
+  cancelBtn.classList.add("btn");
+  cancelBtn.style.color = "white";
+  cancelBtn.textContent = "Cancel";
+  cancelBtn.style.marginLeft = ".5em";
+  addItemBtn.insertAdjacentElement("afterend", cancelBtn);
   inputEl.style.outlineStyle = "solid";
   inputEl.style.outlineWidth = "2px";
   inputEl.style.outlineColor = "yellow";
@@ -131,6 +138,9 @@ const editItem = (e) => {
   const index = localStorageArray.indexOf(e.textContent);
 
   addItemBtn.addEventListener("click", () => {
+    if (inputEl.value === e.textContent) {
+      return;
+    }
     restoreButton();
     removeItemFromLocalStorage(e.textContent);
     addItemToLocalStorageWithIndex(inputEl.value, index);
