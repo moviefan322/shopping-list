@@ -200,7 +200,7 @@ itemsEl.addEventListener("click", (e) => {
 
       removeItemFromLocalStorage(targetItemText);
     });
-  } else {
+  } else if (e.target.tagName === "LI") {
     editItem(e.target);
   }
 });
