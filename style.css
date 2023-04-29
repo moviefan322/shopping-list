@@ -195,3 +195,11 @@ header h1 {
     opacity: 1;
   }
 }
+
+.edit-mode {
+  color: gray;
+  outline-style: dotted;
+  outline-color: yellow;
+  outline-width: 3px;
+  border: yellow 2px dotted;
+}

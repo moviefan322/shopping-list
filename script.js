@@ -11,6 +11,7 @@ const deleteBtn = document.querySelector("#deleteBtn");
 const cancelBtn = document.querySelector("#cancel");
 const filterInput = document.querySelector("#filter");
 const addItemBtn = document.querySelector("#addItemBtn");
+const formControl = document.querySelector(".form-control");
 
 // globally scopes custom error message for form control
 const errMessage = document.createElement("p");
@@ -38,8 +39,11 @@ const checkLocalStorage = () => {
 // adds new item to the list
 const addItem = (e) => {
   e.preventDefault();
+  const items = Array.from(itemsEl.children);
+  items.forEach((item) => console.log(item.childNodes[0]));
   const newItem = inputEl.value;
   errMessage.remove();
+  console.log("newitem", newItem);
 
   if (newItem.length === 0) {
     inputEl.style.outlineStyle = "solid";
@@ -47,13 +51,17 @@ const addItem = (e) => {
     inputEl.style.outlineColor = "red";
     inputEl.insertAdjacentElement("afterend", errMessage);
     return;
+  } else if (items.some((item) => item.innerHTML.includes(newItem))) {
+    errMessage.textContent = "This item already exists";
+    inputEl.insertAdjacentElement("afterend", errMessage);
+    return;
+  } else {
+    addItemToDom(newItem);
+    addItemToLocalStorage(newItem);
+
+    checkItems();
+    inputEl.value = "";
   }
-
-  addItemToDom(newItem);
-  addItemToLocalStorage(newItem);
-
-  checkItems();
-  inputEl.value = "";
 };
 
 // renders items to the DOM
@@ -96,11 +104,21 @@ const checkItems = () => {
 };
 
 const editItem = (e) => {
+  if (formControl.children[0].tagName === "P") {
+    const formP = formControl.querySelectorAll("p");
+    formP.forEach((p) => p.remove());
+  }
+  const items = Array.from(itemsEl.children);
+  items.forEach((item) => item.classList.remove("edit-mode"));
+
+  e.classList.add("edit-mode");
+  console.log("e", e);
   inputEl.style.outlineStyle = "solid";
   inputEl.style.outlineWidth = "2px";
   inputEl.style.outlineColor = "yellow";
   inputEl.value = e.textContent;
-  addItemBtn.textContent = "Save Changes";
+  addItemBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Save Changes`;
+  addItemBtn.style.backgroundColor = "green";
   const editMessage = document.createElement("p");
   editMessage.textContent = `Edit ${e.textContent}`;
   editMessage.style.color = "black";
@@ -113,12 +131,10 @@ const editItem = (e) => {
   const index = localStorageArray.indexOf(e.textContent);
 
   addItemBtn.addEventListener("click", () => {
-    console.log(inputEl.value);
     restoreButton();
     removeItemFromLocalStorage(e.textContent);
     addItemToLocalStorageWithIndex(inputEl.value, index);
   });
-  console.log(e);
 };
 
 const restoreButton = () => {
